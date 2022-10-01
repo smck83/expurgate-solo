@@ -8,7 +8,7 @@ xpg8logo.append("# | |____ >  <| |_) | |_| | | | (_| | (_| | ||  __/")
 xpg8logo.append("# |______/_/\_\ .__/ \__,_|_|  \__, |\__,_|\__\___|")
 xpg8logo.append("#             | |               __/ |              ")
 xpg8logo.append("#             |_|              |___/               \n#")
-xpg8logo.append("# https://xpg8.tk | https://github.com/smck83/expurgate ")
+xpg8logo.append("# https://xpg8.tk | https://github.com/smck83/expurgate-solo ")
 from sys import stdout
 from time import sleep
 import dns.resolver
