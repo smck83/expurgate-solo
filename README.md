@@ -16,3 +16,5 @@
 Supervisord listening web (HTTP) port: `9001`
 Supervisord username: `admin`
 Supervisord default password: `Expurgate`
+
+e.g. http://<host-ip-address>:9001
