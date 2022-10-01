@@ -19,4 +19,4 @@ Supervisord username: `admin`
 
 Supervisord default password: `Expurgate`
 
-e.g. http://<host-ip-address>:9001
+e.g. http://\<host-ip-address\>:9001
