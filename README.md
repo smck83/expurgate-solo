@@ -14,7 +14,9 @@
 | SUPERVISOR_PW= | Supervisord is used to run rbldnsd and resolver. Set the password for the web interface DEFAULT: `Expurgate`  - Can be plain text or in SHA1 in format `{SHA}0f01ed56a1e32a05e5ef96e4d779f34784af9a96` | N |
 
 Supervisord listening web (HTTP) port: `9001`
+
 Supervisord username: `admin`
+
 Supervisord default password: `Expurgate`
 
 e.g. http://<host-ip-address>:9001
