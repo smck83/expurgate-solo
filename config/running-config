@@ -8,7 +8,7 @@
 #             | |               __/ |              
 #             |_|              |___/               
 #
-# https://xpg8.tk | https://github.com/smck83/expurgate 
+# https://xpg8.tk | https://github.com/smck83/expurgate-solo
 # DEFAULT CONFIG
 $DATASET ip4set:xpg8.local xpg8.local @
 :3:v=spf1 ip4:$ ~all

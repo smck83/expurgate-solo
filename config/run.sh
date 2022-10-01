@@ -11,7 +11,7 @@ fi
 
 if [ -z "${SUPERVISOR_PW}" ]
 then
-echo password=expurgate >> /etc/supervisor/supervisord.conf
+echo password={SHA}93eb18474e9067ff5a6f98c54b8854026cee02cb >> /etc/supervisor/supervisord.conf
 else
 echo password=$SUPERVISOR_PW >> /etc/supervisor/supervisord.conf
 fi
