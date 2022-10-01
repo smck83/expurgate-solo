@@ -2,6 +2,8 @@
  A single self-hosted dockerized SPF solution built on rbldnsd to simplify, hide and exceed limits with SPF records.
 
 ## Environment Variables
+
+
 | Variable | Description | Required? |
 | ------------- | ------------- | ------------- | ------------- |
 | DELAY= | This is the delay in seconds between running the script to generate new RBLDNSD config files for RBLDNSD to pickup. `DEFAULT: 300` | N |
