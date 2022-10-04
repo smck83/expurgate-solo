@@ -248,7 +248,6 @@ def getSPF(domain):
                                 ip4.append(spfValue[1] + " # ip:" + domain)
                             else:
                                 ip4.append("# error:" + spfValue[1] + " for " + domain)
-
                         else:
                             header.append('# ' + (paddingchar * depth) + ' [Skipped] already added (ip4):' + spfValue[1] + " " + domain)
                     elif re.match('(\+|)ip6\:', spfPart, re.IGNORECASE):
@@ -331,7 +330,7 @@ while totaldomaincount > 0:
         ip6block.append("0:0:0:0:0:0:0:0/0 # all other IPv6 addresses")
         header.append("# IP & Subnet: " + str(len(ipmonitor)))
         ipmonitor.sort() # sort for comparison
-        print(stdoutprefix + 'Comparing CURRENT and PREVIOUS record for changes :' + domain)
+        print(stdoutprefix + 'Comparing CURRENT and PREVIOUS record for changes.')
         if (domain in ipmonitorCompare) and (ipmonitorCompare[domain] != ipmonitor):
             changeDetected += 1
             print(stdoutprefix + 'Change detected! Total Changes:' + str(changeDetected))
@@ -340,7 +339,7 @@ while totaldomaincount > 0:
             ipmonitorCompare[domain] = ipmonitor
             
         elif (domain in ipmonitorCompare) and (ipmonitorCompare[domain] == ipmonitor):
-            print(stdoutprefix + 'No change detected')
+            print(stdoutprefix + 'Exact match! - No change detected')
         else: # domain not in list
             changeDetected += 1
             print(stdoutprefix + 'Change detected - First run, or a domain just added.')
@@ -351,8 +350,6 @@ while totaldomaincount > 0:
     
         # Build running config
         runningconfig = runningconfig + myrbldnsdconfig
-
-
         print(stdoutprefix + 'Required ' + str(depth) + ' lookups.')
     if changeDetected > 0:
         src_path = r'/var/lib/rbldnsd/runningconfig.staging'
