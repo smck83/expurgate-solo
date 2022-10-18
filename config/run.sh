@@ -13,5 +13,6 @@ if [ -z "${SUPERVISOR_PW}" ]
 then
 echo password={SHA}93eb18474e9067ff5a6f98c54b8854026cee02cb >> /etc/supervisor/supervisord.conf
 else
-echo password=$SUPERVISOR_PW >> /etc/supervisor/supervisord.conf
+echo password={SHA}$(echo -n "$SUPERVISOR_PW" | sha1sum | awk '{print $1}') >> /etc/supervisor/supervisord.conf
+SUPERVISOR_PW=Stored!
 fi
