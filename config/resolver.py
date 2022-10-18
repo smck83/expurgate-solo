@@ -9,8 +9,10 @@ xpg8logo.append("# |______/_/\_\ .__/ \__,_|_|  \__, |\__,_|\__\___|")
 xpg8logo.append("#             | |               __/ |              ")
 xpg8logo.append("#             |_|              |___/               \n#")
 xpg8logo.append("# https://xpg8.tk | https://github.com/smck83/expurgate-solo ")
+from cmath import log
 from sys import stdout
 from time import sleep
+from time import strftime
 import dns.resolver
 import re
 from datetime import datetime
@@ -27,6 +29,8 @@ paddingchar = "^"
 spfActionValue ="~all" # default spfAction if lookup fails or not present
 ipmonitorCompare = {}
 loopcount = 0
+totalChangeCount = 0
+lastChangeTime = "No changes"
 
 if 'RESTDB_URL' in os.environ:
     restdb_url = os.environ['RESTDB_URL']
@@ -91,6 +95,10 @@ else:
     delayBetweenRun = 300 #default to 5 minutes
 print("Running delay of : " + str(delayBetweenRun))
 
+def append2disk(input,filename):
+    with open("/opt/expurgate/" + filename,"a") as file2append:
+        file2append.write(str(input))
+
 def write2disk(src_path,dst_path,myrbldnsdconfig):
     with open(src_path, 'w') as fp:
         for item in myrbldnsdconfig:
@@ -118,8 +126,16 @@ def dnsLookup(domain,type):
     if lookupKey not in dnsCache:
         try:
             lookup = [dns_record.to_text() for dns_record in dns.resolver.resolve(domain, type).rrset]    
-        except:
-            error = "DNS Resolution Error - " + type + ":" + domain
+        except dns.resolver.NXDOMAIN:
+            error = "ERROR : No such domain %s" % domain + "[" + type + "]"
+            print(error)
+            header.append("# " + error)
+        except dns.resolver.Timeout:
+            error = "ERROR : Timed out while resolving %s" % domain + "[" + type + "]"
+            print(error)
+            header.append("# " + error)
+        except dns.exception.DNSException:
+            error = "ERROR : Unhandled exception - " + domain + "[" + type + "]"
             print(error)
             header.append("# " + error)
         else:
@@ -174,7 +190,7 @@ def getSPF(domain):
                             includes.append(spfValue[1])
                             getSPF(spfValue[1])
                         elif spfValue[1]:
-                            error = "# ERROR DETECTED: Invalid DNS Record, Loop or Duplicate: " + spfValue[1] + " in " + domain
+                            error = "# WARNING: Loop or Duplicate: " + spfValue[1] + " in " + domain
                             header.append(error)
                             print(error)
                     elif re.match('^(\+|)ptr\:', spfPart, re.IGNORECASE):
@@ -333,16 +349,25 @@ while totaldomaincount > 0:
         print(stdoutprefix + 'Comparing CURRENT and PREVIOUS record for changes.')
         if (domain in ipmonitorCompare) and (ipmonitorCompare[domain] != ipmonitor):
             changeDetected += 1
+            lastChangeTime = strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
             print(stdoutprefix + 'Change detected! Total Changes:' + str(changeDetected))
             print(stdoutprefix + 'Previous Record: ' + str(ipmonitorCompare[domain]))
             print(stdoutprefix + 'New Record: ' + str(ipmonitor))
+            ipAdded = [d for d in ipmonitor if d not in ipmonitorCompare[domain]]
+            ipRemoved = [d for d in ipmonitorCompare[domain] if d not in ipmonitor]
+            print(stdoutprefix + 'Change Summary: +' + str(ipAdded) + ' -' + str(ipRemoved) )
+            append2disk((strftime("%Y-%m-%dT%H:%M:%S", time.localtime()) + ' | CHANGE:' + domain + " | " + "+" + str(ipAdded) + " -" + str(ipRemoved) + '\n'),'change.log')
+            #append2disk(('\n[[[[ CHANGE:' + domain + ' ]]]]\nPrevious Record: ' + str(ipmonitorCompare[domain]) + "\nNew Record:" + str(ipmonitor) + '\n' ),'change.log')
             ipmonitorCompare[domain] = ipmonitor
             
         elif (domain in ipmonitorCompare) and (ipmonitorCompare[domain] == ipmonitor):
             print(stdoutprefix + 'Exact match! - No change detected')
-        else: # domain not in list
+
+        else:
             changeDetected += 1
             print(stdoutprefix + 'Change detected - First run, or a domain just added.')
+            #append2disk(('\nADDED:' + domain + "-" + "+[" + str(ipmonitor) + "] -[]\n"),'change.log')
+            #append2disk(('\n[[[[ NEW:' + domain + ' ]]]]\nPrevious Record: []' + "\nNew Record:" + str(ipmonitor) + '\n' ),'change.log')
             ipmonitorCompare[domain] = ipmonitor
 
         # Join all the pieces together, ready for file output
@@ -352,6 +377,8 @@ while totaldomaincount > 0:
         runningconfig = runningconfig + myrbldnsdconfig
         print(stdoutprefix + 'Required ' + str(depth) + ' lookups.')
     if changeDetected > 0:
+        if loopcount > 1: # dont increment totalChangeCount on first run
+            totalChangeCount += 1
         src_path = r'/var/lib/rbldnsd/runningconfig.staging'
         dst_path = r'/var/lib/rbldnsd/running-config'               
         write2disk(src_path,dst_path,runningconfig)
@@ -361,12 +388,16 @@ while totaldomaincount > 0:
 
     end_time = time.time()
     time_lapsed = (end_time - start_time)
-    print('Time Lapsed (seconds):' + str(math.ceil(time_lapsed)))
+    print(strftime("%Y-%m-%dT%H:%M:%S", time.localtime()) + ' | Time Lapsed (seconds):' + str(math.ceil(time_lapsed)))
     if uptimekumapushurl != None:
         time_lapsed = time_lapsed * 1000 # calculate loop runtime and convert from seconds to milliseconds
-        print("Pushing Uptime Kuma - endpoint : " + uptimekumapushurl + str(math.ceil(time_lapsed)))
+        print(strftime("%Y-%m-%dT%H:%M:%S", time.localtime()) + " | Pushing Uptime Kuma - endpoint : " + uptimekumapushurl + str(math.ceil(time_lapsed)))
         uptimeKumaPush(uptimekumapushurl + str(math.ceil(time_lapsed)))
     dnsReqTotal = len(dnsCache) + cacheHit
-    print("Total Requests:" + str(dnsReqTotal) + " | DNS Cache Size:" + str(len(dnsCache)) + " | DNS Cache Hits:" + str(cacheHit) + " | DNS Cache vs Total:" + str(math.ceil((cacheHit/dnsReqTotal)*100)) + "%")
-    print("Waiting " + str(delayBetweenRun) + " seconds before running again... ")  
+    print(strftime("%Y-%m-%dT%H:%M:%S", time.localtime()) + " | Total Requests:" + str(dnsReqTotal) + " | DNS Cache Size:" + str(len(dnsCache)) + " | DNS Cache Hits:" + str(cacheHit) + " | DNS Cache vs Total:" + str(math.ceil((cacheHit/dnsReqTotal)*100)) + "%")
+    print("Total Changes:" + str(totalChangeCount) + " | Last Change:" + lastChangeTime)
+    print(strftime("%Y-%m-%dT%H:%M:%S", time.localtime()) + " | Waiting " + str(delayBetweenRun) + " seconds before running again... ")  
     sleep(int(delayBetweenRun)) # wait DELAY in secondsbefore running again.
+
+
+
