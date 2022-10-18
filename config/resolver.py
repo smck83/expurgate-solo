@@ -23,6 +23,7 @@ import math
 import requests
 import json
 import ipaddress
+import sys
 from jsonpath_ng.ext import parse
 
 paddingchar = "^"
@@ -117,7 +118,7 @@ def uptimeKumaPush (url):
     try:
         x = requests.get(url)
     except:
-        print("ERROR: Uptime Kuma - push notification")
+        print("ERROR: Uptime Kuma - push notification",file=sys.stderr)
 
 def dnsLookup(domain,type):
     global depth
@@ -128,15 +129,15 @@ def dnsLookup(domain,type):
             lookup = [dns_record.to_text() for dns_record in dns.resolver.resolve(domain, type).rrset]    
         except dns.resolver.NXDOMAIN:
             error = "ERROR : No such domain %s" % domain + "[" + type + "]"
-            print(error)
+            print(error,file=sys.stderr)
             header.append("# " + error)
         except dns.resolver.Timeout:
             error = "ERROR : Timed out while resolving %s" % domain + "[" + type + "]"
-            print(error)
+            print(error,file=sys.stderr)
             header.append("# " + error)
         except dns.exception.DNSException:
             error = "ERROR : Unhandled exception - " + domain + "[" + type + "]"
-            print(error)
+            print(error,file=sys.stderr)
             header.append("# " + error)
         else:
             dnsCache[lookupKey] = lookup
@@ -190,9 +191,10 @@ def getSPF(domain):
                             includes.append(spfValue[1])
                             getSPF(spfValue[1])
                         elif spfValue[1]:
-                            error = "# WARNING: Loop or Duplicate: " + spfValue[1] + " in " + domain
+                            error = "WARNING: Loop or Duplicate: " + spfValue[1] + " in " + domain
                             header.append(error)
                             print(error)
+                            print(error,file=sys.stderr)
                     elif re.match('^(\+|)ptr\:', spfPart, re.IGNORECASE):
                             otherValues.append(spfPart)
                             ipmonitor.append(spfPart)
@@ -290,7 +292,9 @@ while totaldomaincount > 0:
         try:
             mydomains = restdb(restdb_url,restdb_key) 
         except:
-            print("Error: restdb connection")
+            error = "Error: restdb connection"
+            print(error)
+            print(error,file=sys.stderr)
         else:
             totaldomaincount = len(mydomains)
     runningconfig = []
