@@ -1,5 +1,5 @@
 # Expurgate Solo
- A single self-hosted dockerized SPF solution built on rbldnsd to simplify, hide and exceed limits with SPF records.
+ A self-hosted (single) dockerized SPF solution built on rbldnsd to simplify, hide and exceed limits with SPF records.
 
 ## Environment Variables
 
