@@ -17,3 +17,5 @@ echo Received as SHA && echo password=$SUPERVISOR_PW >> /etc/supervisor/supervis
 else
 echo Not received as SHA && echo password=\{SHA\}$(echo -n "$SUPERVISOR_PW" | sha1sum | awk '{print $1}') >> /etc/supervisor/supervisord.conf
 fi
+
+/usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf

@@ -16,6 +16,6 @@ WORKDIR /opt/expurgate/
 
 VOLUME ["/var/lib/rbldnsd"]
 
-ENTRYPOINT /opt/expurgate/config/run.sh && sleep 3 && /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
+ENTRYPOINT /opt/expurgate/config/run.sh
 
 EXPOSE 53/udp 9001/tcp
