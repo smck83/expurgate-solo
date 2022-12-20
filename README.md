@@ -20,3 +20,7 @@ Supervisord username: `admin`
 Supervisord default password: `Expurgate`
 
 e.g. http://\<host-ip-address\>:9001
+
+Run the container now
+
+`docker run -t -p 9001:9001 -p 53:53/udp -e ZONE=_spf.example.org -e MY_DOMAINS="xpg8.tk" -e SOURCE_PREFIX="_sd6sdyfn" --dns 1.1.1.1 --dns 8.8.8.8 smck83/expurgate-solo`
