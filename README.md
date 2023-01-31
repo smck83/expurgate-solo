@@ -1,5 +1,5 @@
 # Expurgate Solo
- A self-hosted (single) dockerized SPF solution built on rbldnsd to simplify, hide and exceed limits with SPF records.
+ A self-hosted (single) dockerized SPF solution built on rbldnsd to simplify, hide and exceed limits with SPF records, based on https://github.com/smck83/expurgate
 
 ## Environment Variables
 
@@ -20,3 +20,7 @@ Supervisord username: `admin`
 Supervisord default password: `Expurgate`
 
 e.g. http://\<host-ip-address\>:9001
+
+Run the container now
+
+`docker run -t -p 9001:9001 -p 53:53/udp -e ZONE=_spf.example.org -e MY_DOMAINS="xpg8.tk" -e SOURCE_PREFIX="_sd6sdyfn" --dns 1.1.1.1 --dns 8.8.8.8 smck83/expurgate-solo`
