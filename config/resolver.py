@@ -58,7 +58,7 @@ if 'SOURCE_PREFIX' in os.environ:
 else:
     source_prefix = "_xpg8"
 
-def restdb(restdb_url,restdb_key):
+def restdb(restdb_url,restdb_key,mydomains):
     payload={}
     headers = {
     'Content-Type': 'application/json',
@@ -66,15 +66,20 @@ def restdb(restdb_url,restdb_key):
     }
 
     domains = []
-    response = requests.request("GET", restdb_url, headers=headers, data=payload)
-    out = response.text
-    aList = json.loads(out)
-    jsonpath_expression = parse("$..domain")
+    try:
+        response = requests.request("GET", restdb_url, headers=headers, data=payload)
+    except:
+        print("Error - restdb request failed")
+    else:
+        out = response.text
+        aList = json.loads(out)
+        jsonpath_expression = parse("$..domain")
 
-    for match in jsonpath_expression.find(aList):
-        domains.append(match.value)
+        for match in jsonpath_expression.find(aList):
+            domains.append(match.value)
+        if len(domains) > 0:
+            return domains
 
-    return domains
 
 if 'MY_DOMAINS' in os.environ and restdb_url == None:
     domains = os.environ['MY_DOMAINS']
@@ -82,7 +87,10 @@ if 'MY_DOMAINS' in os.environ and restdb_url == None:
     mydomains = [domain for domain in mydomains if '.' in domain] # confirm domain contains a fullstop
     mydomains = list(dict.fromkeys(mydomains)) # dedupe the list of domains
 elif restdb_url != None:
-    mydomains = restdb(restdb_url,restdb_key) 
+    restdbdomains = restdb(restdb_url,restdb_key)
+    if len(restdbdomains) > 0:
+        mydomains = restdbdomains
+
 else:
     source_prefix_off = True
     mydomains = ['_spf.google.com','_netblocks.mimecast.com','spf.protection.outlook.com','outbound.mailhop.org','spf.messagelabs.com','mailgun.org','sendgrid.net','service-now.com'] # demo mode
@@ -208,16 +216,20 @@ def getSPF(domain):
                             header.append("# " + (paddingchar * depth) + " " + spfPart)
                             result = [(x + ' # a:' + spfValue[1]) for x in result]
                             result.sort() # sort
-                            result = ('\n').join(result)
-                            ip4.append(result)
+                            #result = ('\n').join(result)
+                            #ip4.append(result)
+                            for record in result:
+                                ip4.append(record)
                     elif re.match('^(\+|)a', spfPart, re.IGNORECASE):
                         result = dnsLookup(domain,"A")
                         if result:  
                             header.append("# " + (paddingchar * depth) + " " + spfPart + "(" + domain + ")")
                             result = [x + " # a(" + domain + ")" for x in result]
                             result.sort() # sort
-                            result = ('\n').join(result)
-                            ip4.append(result)
+                            #result = ('\n').join(result)
+                            #ip4.append(result)
+                            for record in result:
+                                ip4.append(record)
                     elif re.match('^(\+|)mx\:', spfPart, re.IGNORECASE):
                         spfValue = spfPart.split(':')
                         result = dnsLookup(spfValue[1],"MX") 
@@ -233,8 +245,10 @@ def getSPF(domain):
                                 if result:
                                     result = [x + ' # ' + spfPart + '=>a:' + hostname for x in result]
                                     result.sort() # sort
-                                    result = ('\n').join(result)
-                                    ip4.append(result)
+                                    #result = ('\n').join(result)
+                                    #ip4.append(result)
+                                    for record in result:
+                                        ip4.append(record)
                                     header.append("# " + (paddingchar * depth) + " " + spfPart + "=>a:" + hostname)
 
                     elif re.match('^(\+|)mx', spfPart, re.IGNORECASE):
@@ -251,8 +265,10 @@ def getSPF(domain):
                                 if result:
                                     result = [x + ' # mx(' + domain + ')=>a:' + hostname for x in result ]
                                     result.sort() # sort
-                                    result = ('\n').join(result)
-                                    ip4.append(result)
+                                    #result = ('\n').join(result)
+                                    #ip4.append(result)
+                                    for record in result:
+                                        ip4.append(record)
                                     header.append("# " + (paddingchar * depth) + " mx(" + domain + ")=>a:" + hostname)
 
                     elif re.match('^(\+|)ip4\:', spfPart, re.IGNORECASE):
