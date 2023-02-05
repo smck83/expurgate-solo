@@ -10,14 +10,14 @@
 #
 # https://xpg8.tk | https://github.com/smck83/expurgate-solo
 # DEFAULT CONFIG
-$DATASET ip4set:xpg8.local xpg8.local @
+$DATASET ip4set:xpg8.local xpg8.local
 :3:v=spf1 ip4:$ ~all
 192.0.2.1 # non-routable sample ip
 127.0.0.2 # no-routable sample ip
 :99:v=spf1 ~all
 0.0.0.0/1 # all other IPv4 addresses
 128.0.0.0/1 # all other IP IPv4 addresses
-$DATASET ip6trie:xpg8.local xpg8.local @
+$DATASET ip6trie:xpg8.local xpg8.local
 :3:v=spf1 ip6:$ ~all
 :99:v=spf1 ~all
 0:0:0:0:0:0:0:0/0 # all other IPv6 addresses
