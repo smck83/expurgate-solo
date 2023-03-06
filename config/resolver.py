@@ -93,7 +93,7 @@ elif restdb_url != None:
 
 else:
     source_prefix_off = True
-    mydomains = ['_spf.google.com','_netblocks.mimecast.com','spf.protection.outlook.com','outbound.mailhop.org','spf.messagelabs.com','mailgun.org','sendgrid.net','service-now.com'] # demo mode
+    mydomains = ['google.xpg8.tk','_spf.google.com','_netblocks.mimecast.com','spf.protection.outlook.com','outbound.mailhop.org','spf.messagelabs.com','mailgun.org','sendgrid.net','service-now.com'] # demo mode
     print("MY_DOMAIN not set, running in demo mode using " + str(mydomains))
 
 totaldomaincount = len(mydomains)
