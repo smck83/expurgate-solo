@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM pypy:3
 LABEL maintainer="s@mck.la"
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
