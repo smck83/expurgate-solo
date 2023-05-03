@@ -128,7 +128,7 @@ def uptimeKumaPush (url):
     except:
         print("ERROR: Uptime Kuma - push notification",file=sys.stderr)
 
-def dnsLookup(domain,type):
+def dnsLookup(domain,type,countDepth="on"):
     global depth
     global cacheHit
     lookupKey = domain + "-" + type
@@ -150,11 +150,14 @@ def dnsLookup(domain,type):
         else:
             dnsCache[lookupKey] = lookup
             print("++[CACHE][" + domain + "] Added to DNS Cache - " + type)
-            depth += 1 
+            if countDepth=="on":
+                depth += 1
+
             return lookup 
     else:
         lookup = dnsCache[lookupKey]
-        depth += 1
+        if countDepth=="on":
+            depth += 1
         cacheHit += 1
         print("==[CACHE][" + domain + "] Grabbed from DNS Cache - " + type)
         return lookup  
@@ -251,8 +254,8 @@ def getSPF(domain):
                                 mxrecords.append(mxValue[1])
                             mxrecords.sort()
                             for hostname in mxrecords:
-                                result = dnsLookup(hostname,"A")  
-                                result6 = dnsLookup(hostname,"AAAA")
+                                result = dnsLookup(hostname,"A","off")  
+                                result6 = dnsLookup(hostname,"AAAA","off")
                                 if result:
                                     result = [x + ' # ' + spfPart + '=>a:' + hostname for x in result]
                                     result.sort()
@@ -275,8 +278,8 @@ def getSPF(domain):
                                 mxrecords.append(mxValue[1])
                             mxrecords.sort()
                             for hostname in mxrecords:
-                                result = dnsLookup(hostname,"A")
-                                result6 = dnsLookup(hostname,"AAAA")  
+                                result = dnsLookup(hostname,"A","off")  
+                                result6 = dnsLookup(hostname,"AAAA","off")
                                 if result:
                                     result = [x + ' # mx(' + domain + ')=>a:' + hostname for x in result ]
                                     result.sort()
@@ -346,6 +349,7 @@ while totaldomaincount > 0:
         header = []
         header.append(headersummary)
         ip4 = []
+        allIp = []
         ip4header = []
         ip6 = []
         ip6header = []
@@ -382,7 +386,8 @@ while totaldomaincount > 0:
         ip6header.append("$DATASET ip6trie:"+ domain + " " + domain)
         ip6header.append(":3:v=spf1 ip6:$ " + spfActionValue)
         ip6block.append("0:0:0:0:0:0:0:0/0 # all other IPv6 addresses")
-        header.append("# IP & Subnet: " + str(len(ipmonitor)))
+        allIp = ip4 + ip6
+        header.append("# IP & Subnet: " + str(len(allIp)))
         ipmonitor.sort() # sort for comparison
         print(stdoutprefix + 'Comparing CURRENT and PREVIOUS record for changes.')
         if (domain in ipmonitorCompare) and (ipmonitorCompare[domain] != ipmonitor):
