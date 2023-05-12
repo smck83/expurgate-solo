@@ -17,6 +17,8 @@ import dns.resolver
 import re
 from datetime import datetime
 import os
+import signal
+from pathlib import Path
 import shutil
 import time
 import math
@@ -70,6 +72,7 @@ def restdb(restdb_url,restdb_key,mydomains):
         response = requests.request("GET", restdb_url, headers=headers, data=payload)
     except:
         print("Error - restdb request failed")
+        return mydomains    # added 12.May.23
     else:
         out = response.text
         aList = json.loads(out)
@@ -79,6 +82,8 @@ def restdb(restdb_url,restdb_key,mydomains):
             domains.append(match.value)
         if len(domains) > 0:
             return domains
+        else:                   # added 12.May.23
+            return mydomains    # added 12.May.23
 
 
 if 'MY_DOMAINS' in os.environ and restdb_url == None:
@@ -142,6 +147,8 @@ def dnsLookup(domain,type,countDepth="on"):
         except dns.resolver.Timeout:
             error = "ERROR : Timed out while resolving %s" % domain + "[" + type + "]"
             print(error,file=sys.stderr)
+            if countDepth=="on":
+                dnstimeoutcount += 1
             header.append("# " + error)
         except dns.exception.DNSException:
             error = "ERROR : Unhandled exception - " + domain + "[" + type + "]"
@@ -320,7 +327,14 @@ def getSPF(domain):
                         otherValues.append(spfPart)
                     #else: drop everything else
 
+def rbldnsrefresh():
+    rbldnsdpid = Path('/var/run/rbldnsd.pid').read_text()
+    print("rbldnsd pid:",rbldnsdpid)
+    os.kill(int(rbldnsdpid), signal.SIGHUP)
+    
+
 while totaldomaincount > 0:
+    dnstimeoutcount = 0 
     dnsCache = {}
     loopcount += 1
     changeDetected = 0
@@ -408,6 +422,7 @@ while totaldomaincount > 0:
 
         else:
             changeDetected += 1
+
             print(stdoutprefix + 'Change detected - First run, or a domain just added.')
             #append2disk(('\nADDED:' + domain + "-" + "+[" + str(ipmonitor) + "] -[]\n"),'change.log')
             #append2disk(('\n[[[[ NEW:' + domain + ' ]]]]\nPrevious Record: []' + "\nNew Record:" + str(ipmonitor) + '\n' ),'change.log')
@@ -419,12 +434,15 @@ while totaldomaincount > 0:
         # Build running config
         runningconfig = runningconfig + myrbldnsdconfig
         print(stdoutprefix + 'Required ' + str(depth) + ' lookups.')
-    if changeDetected > 0:
+    if changeDetected > 0 and dnstimeoutcount == 0:
         if loopcount > 1: # dont increment totalChangeCount on first run
             totalChangeCount += 1
+        
         src_path = r'/var/lib/rbldnsd/runningconfig.staging'
         dst_path = r'/var/lib/rbldnsd/running-config'               
         write2disk(src_path,dst_path,runningconfig)
+        time.sleep(1)
+        rbldnsrefresh() # tell rbldnsd to rescan <dst_path> for changes
     else:
         print("No changes detected - No file written (" + str(changeDetected) + ")")
     print("MODE: Running Config")

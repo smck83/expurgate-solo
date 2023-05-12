@@ -6,6 +6,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     && mkdir -p /opt/expurgate/config \
     && mkdir -p /var/lib/rbldnsd/
 ADD config /opt/expurgate/config
+ADD ./changes.log /opt/expurgate
 RUN pip3 install dnspython requests jsonpath-ng \
     && mv /opt/expurgate/config/resolver.py /opt/expurgate/ \
     && mv /opt/expurgate/config/running-config /var/lib/rbldnsd/ \
