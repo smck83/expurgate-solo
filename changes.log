@@ -1,4 +1,4 @@
 Date        Change
 2023.05.12  Added a check to ensure if DNS requests are timing out (e.g. internet offline) that a new rbldns config is not written
-2023.05.12  Change handling of RESTDB, so if len(domains) is not > 0 theoriginal mydomains list will be returned. This will assist if the internet connection is offline or RESTDB cannot be contacted.
+2023.05.12  Change handling of RESTDB, so if len(domains) is not > 0 the original mydomains list will be returned. This will assist if the internet connection is offline or RESTDB cannot be contacted.
 2023.05.12  Added changes.log for change management visibility.
