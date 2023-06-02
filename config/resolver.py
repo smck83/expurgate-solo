@@ -98,6 +98,7 @@ elif restdb_url != None:
 
 else:
     source_prefix_off = True
+    
     mydomains = ['google.xpg8.tk','_spf.google.com','_netblocks.mimecast.com','spf.protection.outlook.com','outbound.mailhop.org','spf.messagelabs.com','mailgun.org','sendgrid.net','service-now.com'] # demo mode
     print("MY_DOMAIN not set, running in demo mode using " + str(mydomains))
 
@@ -134,7 +135,7 @@ def uptimeKumaPush (url):
         print("ERROR: Uptime Kuma - push notification",file=sys.stderr)
 
 def dnsLookup(domain,type,countDepth="on"):
-    global depth
+    global depth, dnstimeoutcount
     global cacheHit
     lookupKey = domain + "-" + type
     if lookupKey not in dnsCache:
@@ -434,6 +435,7 @@ while totaldomaincount > 0:
         # Build running config
         runningconfig = runningconfig + myrbldnsdconfig
         print(stdoutprefix + 'Required ' + str(depth) + ' lookups.')
+    #if changeDetected > 0:
     if changeDetected > 0 and dnstimeoutcount == 0:
         if loopcount > 1: # dont increment totalChangeCount on first run
             totalChangeCount += 1
