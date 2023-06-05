@@ -211,7 +211,7 @@ def getSPF(domain):
                             getSPF(spfValue[1])
                         elif spfValue[1]:
                             error = "WARNING: Loop or Duplicate: " + spfValue[1] + " in " + domain
-                            header.append(error)
+                            header.append("# " + error)
                             print(error)
                             print(error,file=sys.stderr)
                     elif re.match('^(\+|)ptr\:', spfPart, re.IGNORECASE):
