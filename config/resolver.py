@@ -53,7 +53,7 @@ else:
 if 'SOURCE_PREFIX_OFF' in os.environ:
     source_prefix_off = os.environ['SOURCE_PREFIX_OFF']
 else:
-    source_prefix_off = False # set to True to be able to run against root domain, for vendor flattening e.g. replace include:_spf.google.com which needs 3 lookups with include:%{ir}._spf.google.com._spf.yourdomain.com or include:outbound.mailhop.org which needs 4 lookups with include:%{ir}.outbound.mailhop.org._spf.yourdomain.com
+    source_prefix_off = False # set to True to be able to run against root domain, for flattening a specific host you don't control e.g. replace include:_spf.google.com which needs 3 lookups with include:%{ir}._spf.google.com._spf.yourdomain.com or include:outbound.mailhop.org which needs 4 lookups with include:%{ir}.outbound.mailhop.org._spf.yourdomain.com
 
 if 'SOURCE_PREFIX' in os.environ:
     source_prefix = os.environ['SOURCE_PREFIX']
@@ -430,13 +430,13 @@ while totaldomaincount > 0:
             ipmonitorCompare[domain] = ipmonitor
 
         # Join all the pieces together, ready for file output
-        myrbldnsdconfig = header + ip4header + ip4 + ip4block + ip6header + ip6 + ip6block
+        myrbldnsdconfig = header + ip4header + list(set(ip4)) + ip4block + ip6header + list(set(ip6)) + ip6block # Change ip4 and ip5 to set() to remove duplicate rows 16.06.23 - will not help if IP is duplicate from multiple source hostnames (e.g. different # comment appended)
     
         # Build running config
         runningconfig = runningconfig + myrbldnsdconfig
         print(stdoutprefix + 'Required ' + str(depth) + ' lookups.')
     #if changeDetected > 0:
-    if changeDetected > 0 and dnstimeoutcount == 0:
+    if changeDetected > 0: # and dnstimeoutcount == 0:
         if loopcount > 1: # dont increment totalChangeCount on first run
             totalChangeCount += 1
         
