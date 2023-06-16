@@ -430,7 +430,7 @@ while totaldomaincount > 0:
             ipmonitorCompare[domain] = ipmonitor
 
         # Join all the pieces together, ready for file output
-        myrbldnsdconfig = header + ip4header + list(set(ip4)) + ip4block + ip6header + list(set(ip6)) + ip6block # Change ip4 and ip5 to set() to remove duplicate rows 16.06.23 - will not help if IP is duplicate from multiple source hostnames (e.g. different # comment appended)
+        myrbldnsdconfig = header + ip4header + list(set(ip4)) + ip4block + ip6header + list(set(ip6)) + ip6block # Change ip4 and ip6 to set() to remove duplicate rows 16.06.23 - will not help if IP is duplicate from multiple source hostnames (e.g. different # comment appended)
     
         # Build running config
         runningconfig = runningconfig + myrbldnsdconfig
