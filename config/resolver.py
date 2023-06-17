@@ -145,17 +145,28 @@ def dnsLookup(domain,type,countDepth="on"):
             error = "ERROR : No such domain %s" % domain + "[" + type + "]"
             print(error,file=sys.stderr)
             header.append("# " + error)
+            if depth == 0:
+                mydomains_source_failure.append(domain)
         except dns.resolver.Timeout:
             error = "ERROR : Timed out while resolving %s" % domain + "[" + type + "]"
             print(error,file=sys.stderr)
             if countDepth=="on":
                 dnstimeoutcount += 1
             header.append("# " + error)
+            if depth == 0:
+                mydomains_source_failure.append(domain)
         except dns.exception.DNSException:
             error = "ERROR : Unhandled exception - " + domain + "[" + type + "]"
             print(error,file=sys.stderr)
             header.append("# " + error)
+            if depth == 0:
+                mydomains_source_failure.append(domain)
+        except Exception as e:
+            if depth == 0:
+                mydomains_source_failure.append(domain)
         else:
+            if depth == 0:
+                mydomains_source_success.append(domain)
             dnsCache[lookupKey] = lookup
             print("++[CACHE][" + domain + "] Added to DNS Cache - " + type)
             if countDepth=="on":
@@ -335,6 +346,8 @@ def rbldnsrefresh():
     
 
 while totaldomaincount > 0:
+    mydomains_source_success = []
+    mydomains_source_failure = []
     dnstimeoutcount = 0 
     dnsCache = {}
     loopcount += 1
@@ -407,7 +420,6 @@ while totaldomaincount > 0:
         print(stdoutprefix + 'Comparing CURRENT and PREVIOUS record for changes.')
         if (domain in ipmonitorCompare) and (ipmonitorCompare[domain] != ipmonitor):
             changeDetected += 1
-            lastChangeTime = strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
             print(stdoutprefix + 'Change detected! Total Changes:' + str(changeDetected))
             print(stdoutprefix + 'Previous Record: ' + str(ipmonitorCompare[domain]))
             print(stdoutprefix + 'New Record: ' + str(ipmonitor))
@@ -436,17 +448,22 @@ while totaldomaincount > 0:
         runningconfig = runningconfig + myrbldnsdconfig
         print(stdoutprefix + 'Required ' + str(depth) + ' lookups.')
     #if changeDetected > 0:
-    if changeDetected > 0: # and dnstimeoutcount == 0:
-        if loopcount > 1: # dont increment totalChangeCount on first run
-            totalChangeCount += 1
+    if changeDetected > 0  and len(mydomains) == len(mydomains_source_success): # and dnstimeoutcount == 0:
+        totalChangeCount += 1
         
         src_path = r'/var/lib/rbldnsd/runningconfig.staging'
         dst_path = r'/var/lib/rbldnsd/running-config'               
         write2disk(src_path,dst_path,runningconfig)
+        lastChangeTime = strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
         time.sleep(1)
         rbldnsrefresh() # tell rbldnsd to rescan <dst_path> for changes
+    elif len(mydomains_source_failure) > 0:
+        print(f"ERROR: {len(mydomains_source_success)} out of {len(mydomains)} of your domains in MY_DOMAINS resolved successfully.")
+        print("ERROR: Ensure each domain in MY_DOMAINS has a valid SPF record setup at SOURCE_PREFIX.<domainname>")
+        print("ERROR: No config file written, ensure internet and dns connectivity is working")
+        print("ERROR: SPF TXT records requiring attention:",len(mydomains_source_failure),"-", str(mydomains_source_failure))
     else:
-        print("No changes detected - No file written (" + str(changeDetected) + ")")
+        print("No issues & no changes detected - No file written (" + str(changeDetected) + f") Last change {lastChangeTime}")
     print("MODE: Running Config")
 
     end_time = time.time()
