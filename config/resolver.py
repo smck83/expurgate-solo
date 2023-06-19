@@ -350,7 +350,7 @@ def getSPF(domain):
 
 def rbldnsrefresh():
     rbldnsdpid = Path('/var/run/rbldnsd.pid').read_text()
-    print("rbldnsd pid:",rbldnsdpid)
+    print(f"Notifying rbldnsd there is a change and to refresh the config file(via SIGHUP to pid:{rbldnsdpid})")
     os.kill(int(rbldnsdpid), signal.SIGHUP)
     
 
@@ -435,7 +435,6 @@ while totaldomaincount > 0:
             ipRemoved = [d for d in ipmonitorCompare[domain] if d not in ipmonitor]
             print(stdoutprefix + 'Change Summary: +' + str(ipAdded) + ' -' + str(ipRemoved) )
             append2disk((strftime("%Y-%m-%dT%H:%M:%S", time.localtime()) + ' | CHANGE:' + domain + " | " + "+" + str(ipAdded) + " -" + str(ipRemoved) + '\n'),'change.log')
-            #append2disk(('\n[[[[ CHANGE:' + domain + ' ]]]]\nPrevious Record: ' + str(ipmonitorCompare[domain]) + "\nNew Record:" + str(ipmonitor) + '\n' ),'change.log')
             ipmonitorCompare[domain] = ipmonitor
             
         elif (domain in ipmonitorCompare) and (ipmonitorCompare[domain] == ipmonitor):
@@ -468,7 +467,7 @@ while totaldomaincount > 0:
         print("ERROR: No config file written, ensure internet and dns connectivity is working")
         print("ERROR: SPF TXT records requiring attention:",len(mydomains_source_failure),"-", str(mydomains_source_failure))
     else:
-        print(f"No issues & no changes detected - No file written (Changes: {str(changeDetected)}, Last change: {lastChangeTime}")
+        print(f"No issues & no changes detected - No file written (Changes: {str(changeDetected)}, Last change: {lastChangeTime})")
     print("MODE: Running Config")
 
     end_time = time.time()
