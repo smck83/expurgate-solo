@@ -349,7 +349,7 @@ def getSPF(domain):
                     #else: drop everything else
 
 def rbldnsrefresh():
-    rbldnsdpid = Path('/var/run/rbldnsd.pid').read_text()
+    rbldnsdpid = Path('/var/run/rbldnsd.pid').read_text().strip()
     print(f"Notifying rbldnsd there is a change and to refresh the config file(via SIGHUP to pid:{rbldnsdpid})")
     os.kill(int(rbldnsdpid), signal.SIGHUP)
     
