@@ -141,26 +141,12 @@ def dnsLookup(domain,type,countDepth="on"):
     lookupKey = domain + "-" + type
     if lookupKey not in dnsCache:
         try:
-            lookup = [dns_record.to_text() for dns_record in dns.resolver.resolve(domain, type).rrset]    
-        except dns.resolver.NXDOMAIN:
-            error = "ERROR : No such domain %s" % domain + "[" + type + "]"
-            print(error,file=sys.stderr)
-            header.append("# " + error)
-            if depth == 0 and type=="TXT":
-                mydomains_source_failure.append(domain)
-        except dns.resolver.Timeout:
-            error = "ERROR : Timed out while resolving %s" % domain + "[" + type + "]"
-            print(error,file=sys.stderr)
-            header.append("# " + error)
-            if depth == 0 and type=="TXT":
-                mydomains_source_failure.append(domain)
-        except dns.exception.DNSException:
+            lookup = [dns_record.to_text() for dns_record in dns.resolver.resolve(domain, type).rrset]
+
+        except Exception as e:
             error = "ERROR : Unhandled exception - " + domain + "[" + type + "]"
             print(error,file=sys.stderr)
             header.append("# " + error)
-            if depth == 0 and type=="TXT":
-                mydomains_source_failure.append(domain)
-        except Exception as e:
             print(e)
             if depth == 0 and type=="TXT":
                 mydomains_source_failure.append(domain)
@@ -184,6 +170,18 @@ def dnsLookup(domain,type,countDepth="on"):
             return lookup 
     else:
         lookup = dnsCache[lookupKey]
+        if depth == 0 and type == "TXT":
+            for record in lookup:
+                if record != None and re.match('^"v=spf1 ', record, re.IGNORECASE): # check if the first lookup record has a TXT SPF record.
+                    mydomains_source_success_status = True
+
+            if mydomains_source_success_status == True: # using boolean, so as to only add 1 record (incase a domain has multiple v=spf1 records)
+                mydomains_source_success.append(domain)
+            else:
+                mydomains_source_failure.append(domain) # has TXT record, but no SPF records.
+                print(domain,lookup)
+                time.sleep(1)        
+        
         if countDepth=="on":
             depth += 1
         cacheHit += 1
@@ -204,7 +202,7 @@ def getSPF(domain):
            result = dnsLookup(domain,"TXT")
    
     except:
-        print("An exception occurred, check there is a DNS TXT record with SPF present at: " + str(source_prefix) + "." + str(domain) )
+        print("An exception occurred, check there is a DNS TXT record with SPpF present at: " + str(source_prefix) + "." + str(domain) )
     if result:
         for record in result:
             if record != None and re.match('^"v=spf1 ', record, re.IGNORECASE):
@@ -467,6 +465,12 @@ while totaldomaincount > 0:
         print("ERROR: No config file written, ensure internet and dns connectivity is working")
         print("ERROR: SPF TXT records requiring attention:",len(mydomains_source_failure),"-", str(mydomains_source_failure))
     else:
+        print(f"{len(mydomains_source_success)} out of {len(mydomains)} of your domains in MY_DOMAINS resolved successfully.")
+        for domain in mydomains:
+            if source_prefix +"." + domain not in mydomains_source_success:
+                print("ERROR:", domain)
+        print("SPF TXT records requiring attention:",len(mydomains_source_failure),"-", str(mydomains_source_failure))
+        #print(mydomains_source_success)
         print(f"No issues & no changes detected - No file written (Changes: {str(changeDetected)}, Last change: {lastChangeTime})")
     print("MODE: Running Config")
 
