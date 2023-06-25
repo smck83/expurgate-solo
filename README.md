@@ -12,7 +12,7 @@
 | UPTIMEKUMA_PUSH_URL | Monitor expurgate-resolver health (uptime and time per loop) with an [Uptime Kuma](https://github.com/louislam/uptime-kuma) 'push' monitor. URL should end in ping= Example: `https://status.yourdomain.com/api/push/D0A90al0HA?status=up&msg=OK&ping=` | N |
 | ZONE | The last part of your SPF record (where rbldnsd is hosted), from step 1(2) EXAMPLE: `_spf.yourdomain.com`  | Y |
 | SUPERVISOR_PW | Supervisord is used to run rbldnsd and resolver. Set the password for the web interface DEFAULT: `Expurgate`  - Input as plaintext | N |
-| TZ | Timezone e.g. `Australia/Sydney` (more here)[https://en.wikipedia.org/wiki/List_of_tz_database_time_zones]|
+| TZ | Timezone e.g. `Australia/Sydney` (more here)![https://en.wikipedia.org/wiki/List_of_tz_database_time_zones]|
 
 Supervisord listening web (HTTP) port: `9001`
 
