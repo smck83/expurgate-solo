@@ -35,3 +35,4 @@ docker run -p 9001:9001 -p 53:53/udp -e ZONE=_dns.xpg8.tk -e MY_DOMAINS="_netblo
 
 
 ````
+[![How to run Expurgate Solo for SPF Macro hosting in Amazon Lightsail](https://img.youtube.com/vi/MeUNizXkdU8/0.jpg)](https://www.youtube.com/watch?v=MeUNizXkdU8)
