@@ -26,3 +26,12 @@ e.g. http://\<host-ip-address\>:9001
 Run the container now
 
 `docker run -t -p 9001:9001 -p 53:53/udp -e ZONE=_spf.example.org -e MY_DOMAINS="xpg8.tk" -e SOURCE_PREFIX="_sd6sdyfn" --dns 1.1.1.1 --dns 8.8.8.8 smck83/expurgate-solo`
+
+Run Expurgate Solo on an Amazon Lightsail Debian instance using this in your Launch Script:
+NOTE: You will also need to open udp/53 to the host and if you like, tcp/9001 restricted to your IP to access supervisord
+````
+wget https://raw.githubusercontent.com/smck83/expurgate-solo/main/install.sh && chmod 755 install.sh && ./install.sh && \
+docker run -p 9001:9001 -p 53:53/udp -e ZONE=_dns.xpg8.tk -e MY_DOMAINS="_netblocks.mimecast.com _spf.google.com email.freshdesk.com spf.protection.outlook.com sendgrid.net mailgun.org outbound.mailhop.org" -e SOURCE_PREFIX_OFF=True --dns 1.1.1.1 --dns 8.8.8.8 --restart always smck83/expurgate-solo
+
+
+````
