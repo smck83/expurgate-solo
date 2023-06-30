@@ -471,9 +471,6 @@ while totaldomaincount > 0:
         print("ERROR: SPF TXT records requiring attention:",len(mydomains_source_failure),"-", str(mydomains_source_failure))
     else:
         print(f"{len(mydomains_source_success)} out of {len(mydomains)} of your domains in MY_DOMAINS resolved successfully.")
-        for domain in mydomains:
-            if source_prefix +"." + domain not in mydomains_source_success:
-                print("ERROR:", domain)
         print("SPF TXT records requiring attention:",len(mydomains_source_failure),"-", str(mydomains_source_failure))
         #print(mydomains_source_success)
         print(f"No issues & no changes detected - No file written (Changes: {str(changeDetected)}, Last change: {lastChangeTime})")
