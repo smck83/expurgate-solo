@@ -15,7 +15,7 @@ RUN pip3 install dnspython requests jsonpath-ng \
 WORKDIR /opt/expurgate/
 
 
-VOLUME ["/var/lib/rbldnsd"]
+#VOLUME ["/var/lib/rbldnsd"]
 
 ENTRYPOINT /opt/expurgate/config/run.sh
 
