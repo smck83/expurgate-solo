@@ -45,6 +45,12 @@ if 'RESTDB_KEY' in os.environ:
 else:
     restdb_key = None
 
+if 'DISCORD_WEBHOOK' in os.environ and re.match('^https:\/\/discord.com\/api\/webhooks\/.*',os.environ['DISCORD_WEBHOOK'], re.IGNORECASE):
+    discordwebhook = os.environ['DISCORD_WEBHOOK']
+else:
+    discordwebhook = None
+
+
 if 'UPTIMEKUMA_PUSH_URL' in os.environ and re.match('^http.*\/api\/push\/.*\&ping\=',os.environ['UPTIMEKUMA_PUSH_URL'], re.IGNORECASE):
     uptimekumapushurl = os.environ['UPTIMEKUMA_PUSH_URL']
 else:
@@ -133,6 +139,21 @@ def uptimeKumaPush (url):
         x = requests.get(url)
     except:
         print("ERROR: Uptime Kuma - push notification",file=sys.stderr)
+
+def messageDiscord (content):
+    body = {
+        "content" : str(content)
+    }
+    headers = {
+        "Content-Type" : "application/json"
+
+    }
+    #print(str(json.dumps(body)))
+    try:
+        requests.post(discordwebhook,headers=headers,data=str(json.dumps(body)))
+        print("SUCCESS: Discord - Message")
+    except Exception as e:
+        print("ERROR: Discord - Message",e)
 
 def dnsLookup(domain,type,countDepth="on"):
     global depth
@@ -437,7 +458,9 @@ while totaldomaincount > 0:
             ipAdded = [d for d in ipmonitor if d not in ipmonitorCompare[domain]]
             ipRemoved = [d for d in ipmonitorCompare[domain] if d not in ipmonitor]
             print(stdoutprefix + 'Change Summary: +' + str(ipAdded) + ' -' + str(ipRemoved) )
-            append2disk((strftime("%Y-%m-%dT%H:%M:%S", time.localtime()) + ' | CHANGE:' + domain + " | " + "+" + str(ipAdded) + " -" + str(ipRemoved) + '\n'),'change.log')
+            changeResult = (strftime("%Y-%m-%dT%H:%M:%S", time.localtime()) + ' | CHANGE:' + domain + " | " + "+" + str(ipAdded) + " -" + str(ipRemoved) + '\n')
+            append2disk(changeResult,'change.log')
+            messageDiscord(changeResult)
             ipmonitorCompare[domain] = ipmonitor
             
         elif (domain in ipmonitorCompare) and (ipmonitorCompare[domain] == ipmonitor):
@@ -445,7 +468,7 @@ while totaldomaincount > 0:
 
         else:
             changeDetected += 1
-
+            messageDiscord(stdoutprefix + 'First run, or a domain has only just been added:  \n\n+' + str(ipmonitor))
             print(stdoutprefix + 'Change detected - First run, or a domain has only just been added.')
 
             ipmonitorCompare[domain] = ipmonitor
@@ -465,7 +488,9 @@ while totaldomaincount > 0:
         time.sleep(1)
         rbldnsrefresh() # tell rbldnsd to rescan <dst_path> for changes
     elif len(mydomains_source_failure) > 0:
-        print(f"ERROR: {len(mydomains_source_success)} out of {len(mydomains)} of your domains in MY_DOMAINS resolved successfully.")
+        source_failure_output = f"{stdoutprefix} ERROR: {len(mydomains_source_success)} out of {len(mydomains)} of your domains in MY_DOMAINS resolved successfully."
+        messageDiscord (str(source_failure_output))
+        print(source_failure_output)
         print("ERROR: Ensure each domain in MY_DOMAINS has a valid SPF record setup at SOURCE_PREFIX.<domainname>")
         print("ERROR: No config file written, ensure internet and dns connectivity is working")
         print("ERROR: SPF TXT records requiring attention:",len(mydomains_source_failure),"-", str(mydomains_source_failure))

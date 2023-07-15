@@ -2,7 +2,7 @@ FROM pypy:3
 LABEL maintainer="s@mck.la"
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    rbldnsd ntp python3 pip supervisor \
+    rbldnsd ntp supervisor \
     && mkdir -p /opt/expurgate/config \
     && mkdir -p /var/lib/rbldnsd/
 ADD ./config /opt/expurgate/config
