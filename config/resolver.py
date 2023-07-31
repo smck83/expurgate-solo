@@ -141,19 +141,20 @@ def uptimeKumaPush (url):
         print("ERROR: Uptime Kuma - push notification",file=sys.stderr)
 
 def messageDiscord (content):
-    body = {
-        "content" : str(content)
-    }
-    headers = {
-        "Content-Type" : "application/json"
+    if discordwebhook != None and content != None:
+        body = {
+            "content" : str(content)
+        }
+        headers = {
+            "Content-Type" : "application/json"
 
-    }
-    #print(str(json.dumps(body)))
-    try:
-        requests.post(discordwebhook,headers=headers,data=str(json.dumps(body)))
-        print("SUCCESS: Discord - Message")
-    except Exception as e:
-        print("ERROR: Discord - Message",e)
+        }
+        #print(str(json.dumps(body)))
+        try:
+            requests.post(discordwebhook,headers=headers,data=str(json.dumps(body)))
+            print("SUCCESS: Discord - Message")
+        except Exception as e:
+            print("ERROR: Discord - Message",e)
 
 def dnsLookup(domain,type,countDepth="on"):
     global depth
@@ -166,7 +167,7 @@ def dnsLookup(domain,type,countDepth="on"):
 
         except Exception as e:
             error = "ERROR : Unhandled exception - " + domain + "[" + type + "]"
-            print(error,file=sys.stderr)
+            print(error)
             header.append("# " + error)
             print(e)
             if depth == 0 and type=="TXT":
@@ -252,7 +253,7 @@ def getSPF(domain):
                             error = "WARNING: Loop or Duplicate: " + spfValue[1] + " in " + domain
                             header.append("# " + error)
                             print(error)
-                            print(error,file=sys.stderr)
+                            #print(error,file=sys.stderr)
                     elif re.match('^(\+|)ptr\:', spfPart, re.IGNORECASE):
                             otherValues.append(spfPart)
                             ipmonitor.append(spfPart)
