@@ -140,7 +140,8 @@ def uptimeKumaPush (url):
     except:
         print("ERROR: Uptime Kuma - push notification",file=sys.stderr)
 
-def messageDiscord (content):
+def messageDiscord (content,delay:int=1):
+    time.sleep(delay)
     if discordwebhook != None and content != None:
         body = {
             "content" : str(content)
@@ -469,7 +470,7 @@ while totaldomaincount > 0:
 
         else:
             changeDetected += 1
-            messageDiscord(stdoutprefix + 'First run, or a domain has only just been added:  \n\n+' + str(ipmonitor))
+            messageDiscord(stdoutprefix + 'First run, or a domain has only just been added:  \n\n+' + str(ipmonitor),2)
             print(stdoutprefix + 'Change detected - First run, or a domain has only just been added.')
 
             ipmonitorCompare[domain] = ipmonitor
