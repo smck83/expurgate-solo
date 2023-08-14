@@ -13,6 +13,7 @@
 | ZONE | The last part of your SPF record (where rbldnsd is hosted), from step 1(2) EXAMPLE: `_spf.yourdomain.com`  | Y |
 | SUPERVISOR_PW | Supervisord is used to run rbldnsd and resolver. Set the password for the web interface DEFAULT: `Expurgate`  - Input as plaintext | N |
 | TZ | Timezone e.g. `Australia/Sydney` [more here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)|
+| DISCORD_WEBHOOK | Discord Channel Webhook for push notifications e.g. `https://discord.com/api/webhooks/123456789101112/ZXhwdXJnYXRlIGlzIGFtYXppbmcgOik` [more here](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)|
 
 
 Supervisord listening web (HTTP) port: `9001`
