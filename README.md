@@ -40,3 +40,7 @@ docker run -d -p 9001:9001 -p 53:53/udp -e ZONE=_dns.xpg8.tk -e MY_DOMAINS="_net
 Check out my tutorial to run Expurgate Solo in an Amazon Lightsail debian instance:
 
 [![How to run Expurgate Solo for SPF Macro hosting in Amazon Lightsail](https://img.youtube.com/vi/MeUNizXkdU8/0.jpg)](https://www.youtube.com/watch?v=MeUNizXkdU8)
+
+
+# Buy me a coffee
+If this was useful, feel free to [Buy me a coffee](https://www.buymeacoffee.com/smc83)
