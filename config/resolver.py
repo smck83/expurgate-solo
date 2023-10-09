@@ -8,7 +8,7 @@ xpg8logo.append("# | |____ >  <| |_) | |_| | | | (_| | (_| | ||  __/")
 xpg8logo.append("# |______/_/\_\ .__/ \__,_|_|  \__, |\__,_|\__\___|")
 xpg8logo.append("#             | |               __/ |              ")
 xpg8logo.append("#             |_|              |___/               \n#")
-xpg8logo.append("# https://xpg8.tk | https://github.com/smck83/expurgate-solo ")
+xpg8logo.append("# https://xpg8.ehlo.email | https://github.com/smck83/expurgate-solo ")
 from cmath import log
 from sys import stdout
 from time import sleep
@@ -105,7 +105,7 @@ elif restdb_url != None:
 else:
     source_prefix_off = True
     
-    mydomains = ['google.xpg8.tk','_spf.google.com','_netblocks.mimecast.com','spf.protection.outlook.com','outbound.mailhop.org','spf.messagelabs.com','mailgun.org','sendgrid.net','service-now.com'] # demo mode
+    mydomains = ['_spf.google.com','_netblocks.mimecast.com','spf.protection.outlook.com','outbound.mailhop.org','spf.messagelabs.com','mailgun.org','sendgrid.net','service-now.com'] # demo mode
     print("MY_DOMAIN not set, running in demo mode using " + str(mydomains))
 
 totaldomaincount = len(mydomains)
@@ -168,8 +168,9 @@ def dnsLookup(domain,type,countDepth="on"):
 
         except Exception as e:
             error = "ERROR : Unhandled exception - " + domain + "[" + type + "]"
-            print(error)
-            header.append("# " + error)
+            if type != "AAAA": # dont log failed ipv6 address lookups
+                print(error)
+                header.append("# " + error)
             print(e)
             if depth == 0 and type=="TXT":
                 mydomains_source_failure.append(domain)

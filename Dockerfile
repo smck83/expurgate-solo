@@ -1,4 +1,5 @@
-FROM pypy:3.9
+FROM python:3.9
+#FROM pypy:3.9
 LABEL maintainer="s@mck.la"
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
