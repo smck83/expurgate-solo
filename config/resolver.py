@@ -66,7 +66,7 @@ if 'SOURCE_PREFIX' in os.environ:
 else:
     source_prefix = "_xpg8"
 
-def restdb(restdb_url,restdb_key,mydomains):
+def restdb(restdb_url,restdb_key):
     payload={}
     headers = {
     'Content-Type': 'application/json',
