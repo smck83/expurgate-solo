@@ -10,7 +10,7 @@
 | ------------- | ------------- | ------------- |
 | DELAY | This is the delay in seconds between running the script to generate new RBLDNSD config files for RBLDNSD to pickup. `DEFAULT: 300` | N |
 | MY_DOMAINS `REQUIRED` | A list of domains seperated by a space that you want config files to be generated for. Example: `yourdomain.com microsoft.com github.com` | Y |
-| SOURCE_PREFIX `REQUIRED` | This is where you will publish your 'hidden' SPF record; the source of truth e.g. you might host it at _sd3fdsfd.yourdomain.com( so will be SOURCE_PREFIX=_sd3fdsfd) Default: `_xpg8` | N |
+| SOURCE_PREFIX `REQUIRED` | This is where you will publish your 'hidden' SPF record; the source of truth e.g. you might host it at _sd3fdsfd.yourdomain.com( so will be SOURCE_PREFIX=_sd3fdsfd) Default: `_xpg8` | Y |
 | UPTIMEKUMA_PUSH_URL | Monitor expurgate-resolver health (uptime and time per loop) with an [Uptime Kuma](https://github.com/louislam/uptime-kuma) 'push' monitor. URL should end in ping= Example: `https://status.yourdomain.com/api/push/D0A90al0HA?status=up&msg=OK&ping=` | N |
 | ZONE `REQUIRED` | The last part of your SPF record (where rbldnsd is hosted), from step 1(2) EXAMPLE: `_spf.yourdomain.com`  | Y |
 | SUPERVISOR_PW | Supervisord is used to run rbldnsd and resolver. Set the password for the web interface - Input as plaintext or as SHA1. e.g. `{SHA}93eb18474e9067ff5a6f98c54b8854026cee02cb` -  DEFAULT: `Expurgate`| N |
