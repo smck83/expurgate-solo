@@ -1,3 +1,4 @@
 
 build-and-run.bat
 *.pyc
+tmp
