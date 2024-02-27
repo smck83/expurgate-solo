@@ -1,4 +1,5 @@
-FROM python:3.9
+FROM python:3.12
+# 21.Feb moved from 3.9 to 3.12
 #FROM pypy:3.9
 LABEL maintainer="s@mck.la"
 

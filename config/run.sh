@@ -5,10 +5,10 @@ cp /opt/expurgate/config/supervisord.conf /etc/supervisor/supervisord.conf
 
 if [ -z "${ZONE}" ]
 then
-echo command=/usr/sbin/rbldnsd -b 0.0.0.0 -n -c 0 -e -t 5m -p /var/run/rbldnsd.pid -l - _default.xpg8.tk:combined:/var/lib/rbldnsd/running-config >> /etc/supervisor/conf.d/rbldnsd.conf
+echo command=/usr/sbin/rbldnsd -b 0.0.0.0 -n -c 0 -e -t 5m -p /var/run/rbldnsd.pid _default.xpg8.tk:combined:/var/lib/rbldnsd/running-config -l +- >> /etc/supervisor/conf.d/rbldnsd.conf
 #echo command=/usr/sbin/rbldnsd -b 0.0.0.0 -n -c 0 -e -t 5m -p /var/run/rbldnsd.pid _default.xpg8.tk:combined:/var/lib/rbldnsd/running-config >> /etc/supervisor/conf.d/rbldnsd.conf
 else
-echo command=/usr/sbin/rbldnsd -b 0.0.0.0 -n -c 0 -e -t 5m -p /var/run/rbldnsd.pid -l - $ZONE:combined:/var/lib/rbldnsd/running-config >> /etc/supervisor/conf.d/rbldnsd.conf
+echo command=/usr/sbin/rbldnsd -b 0.0.0.0 -n -c 0 -e -t 5m -p /var/run/rbldnsd.pid $ZONE:combined:/var/lib/rbldnsd/running-config -l +- >> /etc/supervisor/conf.d/rbldnsd.conf
 # changed per https://github.com/smck83/expurgate-solo/issues/4
 #echo command=/usr/sbin/rbldnsd -b 0.0.0.0 -n -c 0 -e -t 5m -p /var/run/rbldnsd.pid $ZONE:combined:/var/lib/rbldnsd/running-config >> /etc/supervisor/conf.d/rbldnsd.conf
 
