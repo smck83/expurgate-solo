@@ -1,4 +1,5 @@
 Date        Change
+2025.05.21  Changed Dockerfile to use python:3-slim instead of 3.12
 2023.07.06  Discord notfication added. User environment variable DISCORD_WEBHOOK
 2023.06.17  Added error handling so that if ANY SOURCE_PREFIX records fail lookup, no config files are written.
 2023.06.16  Convert ip4 and ip6 to set and back to list, to remove duplicates where the "<ip-or-subnet> # comment" is a match
