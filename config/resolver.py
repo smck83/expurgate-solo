@@ -66,6 +66,16 @@ if 'SOURCE_PREFIX' in os.environ:
 else:
     source_prefix = "_xpg8"
 
+if 'NS_RECORD' in os.environ:
+    ns_record = os.environ['NS_RECORD']
+else:
+    ns_record = None
+
+if 'SOA_HOSTMASTER' in os.environ:
+    soa_hostmaster = os.environ['SOA_HOSTMASTER']
+else:
+    soa_hostmaster = None
+
 def restdb(restdb_url,restdb_key):
     payload={}
     headers = {
@@ -219,7 +229,7 @@ def getSPF(domain):
             sourcerecord = source_prefix + "." + domain
             header.append("# Source of truth:  " + sourcerecord)
             result = dnsLookup(sourcerecord,"TXT")
-        elif depth == 0:
+        elif depth == 0: #i.e. source_prefix_off == True
             header.append("# Source of truth:  " + domain + " - Will not work in production unless you replace a single record. e.g. include:" + domain + " with include:{ir}." + domain + "._spf.yourdomain.com")
             result = dnsLookup(domain,"TXT")
         else:
@@ -371,15 +381,21 @@ def getSPF(domain):
                     #else: drop everything else
 
 def rbldnsrefresh():
-    rbldnsdpid = Path('/var/run/rbldnsd.pid').read_text().strip()
-    print(f"Notifying rbldnsd there is a change and to refresh the config file(via SIGHUP to pid:{rbldnsdpid})")
+    rbldnsdpid = int(-1)
     try:
-        os.kill(int(rbldnsdpid), signal.SIGHUP)
-    except Exception as e:
-        print("Uh-oh! Something went wrong, check 'rbldnsd' is running :",e)
-    else:
-        print(f"Success notifying pid: {rbldnsdpid}")
+        rbldnsdpid = Path('/var/run/rbldnsd.pid').read_text().strip()
+        rbldnsdpid = int(rbldnsdpid)
+    except: 
+        print("Couldnt locate /var/run/rbldnsd.pid","Will not be able to tell rbldnsd to refresh config.")
     
+    if rbldnsdpid > -1:
+        print(f"Notifying rbldnsd there is a change and to refresh the config file(via SIGHUP to pid:{rbldnsdpid})")
+        try:
+            os.kill(int(rbldnsdpid), signal.SIGHUP)
+        except Exception as e:
+            print("Uh-oh! Something went wrong, check 'rbldnsd' is running :",e)
+        else:
+            print(f"Success notifying pid: {rbldnsdpid}")
 
 while totaldomaincount > 0:
     mydomains_source_success = []
@@ -398,6 +414,13 @@ while totaldomaincount > 0:
         else:
             totaldomaincount = len(mydomains)
     runningconfig = []
+    if ns_record != None:
+        xpg8logo.append("$NS 3600 " + ns_record + ".")
+        if soa_hostmaster != None:
+        # Replace the first occurrence of '@' with '.' in soa_hostmaster
+            soa_hostmaster_mod = soa_hostmaster.replace('@', '.', 1)
+            xpg8logo.append("$SOA 0 " + ns_record + ". " + soa_hostmaster_mod + ". 0 10800 3600 604800 3600")
+
     runningconfig = runningconfig + xpg8logo
     runningconfig.append("# Running config for: " + str(totaldomaincount) + ' domains' )
     runningconfig.append("# Source domains: " + ', '.join(mydomains))
@@ -486,7 +509,10 @@ while totaldomaincount > 0:
         totalChangeCount += 1
         src_path = r'/var/lib/rbldnsd/runningconfig.staging'
         dst_path = r'/var/lib/rbldnsd/running-config'               
-        write2disk(src_path,dst_path,runningconfig)
+        try:
+            write2disk(src_path,dst_path,runningconfig)
+        except:
+            write2disk('runningconfig.staging','running-config',runningconfig)
         lastChangeTime = strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
         time.sleep(1)
         rbldnsrefresh() # tell rbldnsd to rescan <dst_path> for changes
