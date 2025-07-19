@@ -71,7 +71,7 @@ if 'NS_RECORD' in os.environ:
 else:
     ns_record = None
 
-if 'SOA_HOSTMASTER' in os.environ:
+if 'SOA_HOSTMASTER' in os.environ and "@" in os.environ['SOA_HOSTMASTER']:
     soa_hostmaster = os.environ['SOA_HOSTMASTER']
 else:
     soa_hostmaster = None
@@ -414,13 +414,11 @@ while totaldomaincount > 0:
         else:
             totaldomaincount = len(mydomains)
     runningconfig = []
-    if ns_record != None:
-        xpg8logo.append("$NS 3600 " + ns_record + ".")
-        if soa_hostmaster != None:
+    if ns_record != None and soa_hostmaster != None:
+        xpg8logo.append("$NS 0 " + ns_record + ".")
         # Replace the first occurrence of '@' with '.' in soa_hostmaster
-            soa_hostmaster_mod = soa_hostmaster.replace('@', '.', 1)
-            xpg8logo.append("$SOA 0 " + ns_record + ". " + soa_hostmaster_mod + ". 0 10800 3600 604800 3600")
-
+        soa_hostmaster_mod = soa_hostmaster.replace('@', '.', 1)
+        xpg8logo.append("$SOA 0 " + ns_record + ". " + soa_hostmaster_mod + ". 0 10800 3600 604800 3600")
     runningconfig = runningconfig + xpg8logo
     runningconfig.append("# Running config for: " + str(totaldomaincount) + ' domains' )
     runningconfig.append("# Source domains: " + ', '.join(mydomains))
