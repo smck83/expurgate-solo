@@ -16,8 +16,8 @@
 | SUPERVISOR_PW | Supervisord is used to run rbldnsd and resolver. Set the password for the web interface - Input as plaintext or as SHA1. e.g. `{SHA}93eb18474e9067ff5a6f98c54b8854026cee02cb` -  DEFAULT: `Expurgate`|
 | TZ | Timezone e.g. `Australia/Sydney` [more here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)|
 | DISCORD_WEBHOOK | Discord Channel Webhook for push notifications e.g. `https://discord.com/api/webhooks/123456789101112/ZXhwdXJnYXRlIGlzIGFtYXppbmcgOik` [more here](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)|
-| NS_RECORD | Set the hostname of your nameserver (e.g. spf-ns.yourdomain.com) to comply with DNS compliance standards `DEFAULT: None` |
-| SOA_HOSTMASTER | Set the e-mail address to populate an SOA record with your - If you use this, `NS_RECORD` is also required. `DEFAULT: None` |
+| NS_RECORD | Set the hostname of your nameserver (e.g. spf-ns.yourdomain.com) to comply with DNS standards - To use this `SOA_HOSTMASTER` is required `DEFAULT: None` |
+| SOA_HOSTMASTER | Set the e-mail address to populate an SOA record with your - To use this `NS_RECORD` is required. `DEFAULT: None` |
 
 
 Supervisord listening web (HTTP) port: `9001`
@@ -30,7 +30,7 @@ e.g. http://\<host-ip-address\>:9001
 
 Run the container now
 
-`docker run -t -p 9001:9001 -p 53:53/udp -e ZONE=_spf.example.org -e MY_DOMAINS="xpg8.tk" -e SOURCE_PREFIX="_sd6sdyfn" --dns 1.1.1.1 --dns 8.8.8.8 smck83/expurgate-solo`
+`docker run -t -p 9001:9001 -p 53:53/udp -e NS_RECORD="ns-spf.example.org" -e SOA_HOSTMASTER="hostmaster@example.org" -e ZONE="_spf.example.org" -e MY_DOMAINS="xpg8.tk" -e SOURCE_PREFIX="_sd6sdyfn" --dns 1.1.1.1 --dns 8.8.8.8 smck83/expurgate-solo`
 
 Run Expurgate Solo on an Amazon Lightsail Debian instance using this in your Launch Script:
 NOTE: You will also need to open udp/53 to the host and if you like, tcp/9001 restricted to your IP to access supervisord
