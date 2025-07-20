@@ -396,7 +396,11 @@ def rbldnsrefresh():
             print("Uh-oh! Something went wrong, check 'rbldnsd' is running :",e)
         else:
             print(f"Success notifying pid: {rbldnsdpid}")
-
+if ns_record != None and soa_hostmaster != None:
+    xpg8logo.append("$NS 0 " + ns_record + ".")
+    # Replace the first occurrence of '@' with '.' in soa_hostmaster
+    soa_hostmaster_mod = soa_hostmaster.replace('@', '.', 1)
+    xpg8logo.append("$SOA 0 " + ns_record + ". " + soa_hostmaster_mod + ". 0 10800 3600 604800 3600")
 while totaldomaincount > 0:
     mydomains_source_success = []
     mydomains_source_failure = []
@@ -414,11 +418,6 @@ while totaldomaincount > 0:
         else:
             totaldomaincount = len(mydomains)
     runningconfig = []
-    if ns_record != None and soa_hostmaster != None:
-        xpg8logo.append("$NS 0 " + ns_record + ".")
-        # Replace the first occurrence of '@' with '.' in soa_hostmaster
-        soa_hostmaster_mod = soa_hostmaster.replace('@', '.', 1)
-        xpg8logo.append("$SOA 0 " + ns_record + ". " + soa_hostmaster_mod + ". 0 10800 3600 604800 3600")
     runningconfig = runningconfig + xpg8logo
     runningconfig.append("# Running config for: " + str(totaldomaincount) + ' domains' )
     runningconfig.append("# Source domains: " + ', '.join(mydomains))
