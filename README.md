@@ -3,10 +3,6 @@
 
  For more detail around the functionality of this solution, please refer to: https://github.com/smck83/expurgate/blob/main/README.md
 
-## Deploy to DigitalOcean
-
-[![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/smck83/expurgate-solo/tree/main)
-
 ## Environment Variables
 
 
