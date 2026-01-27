@@ -3,7 +3,6 @@ spec:
 
   services:
     - name: expurgate-solo
-      type: web
 
       image:
         registry_type: DOCKER_HUB
