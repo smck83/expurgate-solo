@@ -25,6 +25,6 @@ services:
         scope: RUN_TIME
         value: "7200"
       - key: SUPERVISOR_PW
-        type: secret
+		type: secret
 		scope: RUN_TIME
         value: ""
