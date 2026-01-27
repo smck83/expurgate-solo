@@ -1,34 +1,27 @@
-name: expurgate-solo
+spec:
+  name: expurgate-solo
 
-services:
-  - name: expurgate-solo
+  services:
+    - name: expurgate-solo
+      type: web
 
-    image:
-      registry_type: DOCKER_HUB
-      repository: smck83/expurgate-solo
-      tag: latest
+      image:
+        registry_type: DOCKER_HUB
+        repository: smck83/expurgate-solo
+        tag: latest
 
-    http_port: 9001
-    instance_size_slug: basic-xxs
+      http_port: 9001
+      instance_size_slug: basic-xxs
 
-    envs:
-      - key: ZONE
-        scope: RUN_TIME
-        value: ""
-
-      - key: MY_DOMAINS
-        scope: RUN_TIME
-        value: ""
-
-      - key: SOURCE_PREFIX
-        scope: RUN_TIME
-        value: ""
-
-      - key: DELAY
-        scope: RUN_TIME
-        value: "7200"
-
-      - key: SUPERVISOR_PW
-        type: SECRET
-        scope: RUN_TIME
-        value: ""
+      envs:
+        - key: ZONE
+          value: ""
+        - key: MY_DOMAINS
+          value: ""
+        - key: SOURCE_PREFIX
+          value: ""
+        - key: DELAY
+          value: "7200"
+        - key: SUPERVISOR_PW
+          type: SECRET
+          value: ""
