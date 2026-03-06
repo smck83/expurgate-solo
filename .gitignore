@@ -3,3 +3,4 @@ build-and-run.bat
 *.pyc
 tmp
 /todo
+README.md.old
